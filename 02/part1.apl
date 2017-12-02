@@ -51,7 +51,7 @@
       ⍝
       ⍝ This is called a _fork_ , written as (f h g) and will yield a function
       ⍝
-      ⍝    ff : a → d
+      ⍝    ff : t → u
       ⍝
       ⍝ Approximately in haskell: fork f h g x = (f x) `h` (g x)
 
