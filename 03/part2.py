@@ -10,9 +10,10 @@ sequence = []
 
 FOUND = False
 TARGET = 0
-
+FONT = 'Futura', 17, 'italic'
 STROKE_COLOR = '#ff8888'
 SUPREME = "#d02120"
+
 
 def position():
     corrected = tuple(int(p) for p in pos())
@@ -43,7 +44,7 @@ def step():
     FOUND = new > TARGET
 
     pencolor('#000000' if FOUND else '#ffffff')
-    write(new, align='right', font=('Futura', 17, 'italic'))
+    write(new, align='right', font=FONT)
     pencolor(STROKE_COLOR)
 
 
@@ -83,6 +84,7 @@ def random_walk():
     while True:
         random.choice((left, right))(random.randint(1, 80))
         forward(5)
+
 
 def main(target=368078):
     setup()
