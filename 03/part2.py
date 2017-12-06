@@ -1,7 +1,10 @@
+#!/usr/bin/env python3 
+
 from turtle import *
 from collections import defaultdict
 from itertools import product
 import random
+import sys
 
 stepsize = 70
 
@@ -13,6 +16,11 @@ TARGET = 0
 FONT = 'Futura', 17, 'italic'
 STROKE_COLOR = '#ff8888'
 SUPREME = "#d02120"
+
+fillcolor(STROKE_COLOR)
+pencolor(STROKE_COLOR)
+bgcolor(SUPREME)
+width(3)
 
 
 def position():
@@ -56,12 +64,13 @@ def spiral(target=100):
 
     mem[position()] = 1
 
-    i = 0
-    done = False
-    while not done:
-        i = i + 1
+    pendown()
+
+    side_length = 0
+    while True:
+        side_length = side_length + 1
         for _ in range(2):
-            for _ in range(i):
+            for _ in range(side_length):
                 step()
                 if FOUND:
                     return
@@ -69,28 +78,17 @@ def spiral(target=100):
             left(90)
 
 
-def setup():
-    fillcolor(STROKE_COLOR)
-    shape('classic')
-    shapesize(1, 1)
-    speed('normal')
-    pencolor(STROKE_COLOR)
-    bgcolor(SUPREME)
-    width(2)
-    pendown()
-
-
-def random_walk():
+def main(target=368078):
+    spiral(target)
     while True:
-        random.choice((left, right))(random.randint(1, 80))
+        random.choice((left, right))(random.randint(1, 50))
         forward(5)
 
 
-def main(target=368078):
-    setup()
-    spiral(target)
-    random_walk()
-
-
 if __name__ == '__main__':
-    main()
+    try:
+        n = int(sys.argv[1])
+        main(n)
+    except:
+        main()
+
