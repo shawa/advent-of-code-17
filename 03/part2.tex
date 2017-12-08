@@ -1,0 +1,100 @@
+% Created 2017-12-06 Wed 20:50
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\author{Andrew Shaw <shawa1@tcd.ie>}
+\date{\today}
+\title{Computing \(\ell_1\) distance to origin on a Spiral over the Natural Numbers}
+\hypersetup{
+ pdfauthor={Andrew Shaw <shawa1@tcd.ie>},
+ pdftitle={Computing \(\ell_1\) distance to origin on a Spiral over the Natural Numbers},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 25.2.1 (Org mode 9.0.8)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Abstract}
+\label{sec:orga7814cd}
+We present a coordinate space for addressing elements on the Integer Spiral
+which is rotationally symmertric 90\textdegree{} about the origin (1). We develop and
+present useful supporting formulae, in terms of some integer \(n\), for computing
+the coordinates of \(n\) in this space, with a view to computing the \(\ell_1\)
+(taxicab) distance from \(n\) to the origin.
+
+\section{Introduction}
+\label{sec:orge08f20c}
+We define a Spiral over some ordered set \(S\) to be an arrangement of the
+elements of \(S\) in an \(N \times N\) grid - where \(N\) is odd - such that the least
+element of \(S\) is in the centre, with the elements arranged in a
+counter-clockwise fashion, spiralling outward from the centre.
+
+An example of one such Spiral is the Spiral over the Natural numbers, which we
+will denote as \(\mathcal{N}\):
+
+\begin{verbatim}
+DIAGRAM OF THE SPIRAL
+\end{verbatim}
+
+As with any ordered set, it will prove useful to develop a distance metric for
+different elements of \(\mathcal{N}\), not least for solving part one of day three
+of the 2017 edition of the \emph{Advent of Code}. Per the problem, we will concern
+ourselves with the \(\ell_1\) of some element \(n \in \mathcal{N}\) to the origin, 1.
+
+
+\subsection{Shells in the Spiral}
+\label{sec:org42624b0}
+When dealing with elements in \(\mathcal{N}\), it will prove useful to partition
+\(\mathcal{N}\) into subsets radiating outward from the origin, which we will call
+\emph{shells}, denoted as \(S_n\), where \(n\) is the number of shells between \(S_n\) and
+the origin. See, for example, \(S_0\), \(S_1\), and \(S_5\), below, highlighted each
+in red, white and green, respectively:
+
+\begin{verbatim}
+Highlighted DIAGRAM OF THE SPIRAL
+\end{verbatim}
+
+\subsection{Boundary numbers}
+\label{sec:org7992758}
+We define the \emph{boundary number} of a shell to be the greatest number in that
+shell, so-called as it marks the boundary between two successive shells when
+following the spiral from the center.
+
+We can see by inspection that boundary numbers of \(S_0\), \(S_1\), and \(S_3\) are 0,
+9, 25, and 49. Noting that this is simply the sequence of squares of odd
+numbers, in general, the boundary number for \(S_n\) is
+simply
+
+$$ b(n) = (2n + 1)^2 $$
+
+The inverse \footnote{\(b\) is invertible as of course we are ignoring the
+case where \(n\) is negative, as the notion of ``shell -1'' is clearly absurd} of this function 
+
+$$ b^{-1}(S) = \frac{1}{2} (\sqrt{x} - 1) $$
+
+will, given a boundary number, yield its shell number.
+
+
+Further treatment of this function is required should we wish to find the shell
+number of \emph{any} number, not just a boundary number.
+
+A commonly known method of finding the \emph{next closest} square of some real number
+\(x\) is to compute \(\ceil*{\sqrt{x}} ^ 2\).
+\end{document}
