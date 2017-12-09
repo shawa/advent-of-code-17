@@ -22,15 +22,15 @@ toOp :: Operation -> (Int -> Int -> Int)
 toOp Increment = (+)
 toOp Decrement = (-)
 
-execute :: Instruction -> State -> State
-execute (Instruction reg op val condReg cmp cmpVal) state =
+execute :: State -> Instruction -> State
+execute state (Instruction reg op val condReg cmp cmpVal) =
   if cond then Map.insert reg val' state else state
   where get = \reg -> Map.findWithDefault 0 reg state
         cond = (toComp cmp) (get condReg) cmpVal
         val' = (toOp op) (get reg) val
 
 run :: Program -> State
-run = foldr execute Map.empty
+run = foldl execute Map.empty
 
 findMax :: State -> Int
 findMax = Map.foldr max 0

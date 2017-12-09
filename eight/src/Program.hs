@@ -4,19 +4,31 @@ type Value = Int
 
 data Operation = Increment
                | Decrement
-               deriving (Show)
+
+instance Show Operation where
+  show Increment = "inc"
+  show Decrement = "dec"
 
 data Comparison = Eq | Ne | Gt | Lt | Gte | Lte
-               deriving (Show)
+
+instance Show Comparison where
+  show Eq = "=="
+  show Ne = "!="
+  show Gt = ">"
+  show Lt = "<"
+  show Gte = ">="
+  show Lte = "<="
 
 data Instruction = Instruction Register Operation Value Register Comparison Value
-                 deriving (Show)
 
+instance Show Instruction where
+  show (Instruction r o v cr cc cv) = unwords [ r
+                                              , show o
+                                              , show v
+                                              , "if"
+                                              , cr
+                                              , show cc
+                                              , show cv
+                                              ]
 
 type Program = [Instruction]
-x :: Program
-x = [ Instruction "b" Increment 5 "a" Gt 1
-    , Instruction "a" Increment 1 "b" Lt 5
-    , Instruction "c" Decrement (-10) "a" Lte 1
-    , Instruction "c" Increment (-20) "c" Eq 10
-    ]
