@@ -10,7 +10,7 @@ import qualified Data.Map.Strict as Map
 
 type State = Map.Map Register Value
 
-toComp :: Comparison -> (Int -> Int -> Bool)
+toComp :: Comparison -> (Value -> Value -> Bool)
 toComp Eq = (==)
 toComp Ne = (/=)
 toComp Gt = (>)
@@ -18,7 +18,7 @@ toComp Lt = (<)
 toComp Gte = (>=)
 toComp Lte = (<=)
 
-toOp :: Operation -> (Int -> Int -> Int)
+toOp :: Operation -> (Value -> Value -> Value)
 toOp Increment = (+)
 toOp Decrement = (-)
 
@@ -33,15 +33,11 @@ execute state (Instruction reg op val condReg cmp cmpVal) =
 runWithHistory :: Program -> [State]
 runWithHistory = scanl execute Map.empty
 
-findMax :: State -> Int
-findMax = Map.foldr max 0
-
-
 main :: IO ()
 main = do
   args <- getArgs
   let infile = args !! 0
   input <- readFile infile
-  let largests = findMax <$> (runWithHistory $ parseProgram $ lines input)
+  let largests = maximum <$> filter (not . Map.null) (runWithHistory . parseProgram $ lines input)
   putStrLn $ "Largest value at end: " ++ show (last largests)
-  putStrLn $ "Largest value seen: " ++ show (foldr max 0 largests)
+  putStrLn $ "Largest value seen: " ++ show (maximum largests)
