@@ -29,17 +29,19 @@ execute state (Instruction reg op val condReg cmp cmpVal) =
         cond = (toComp cmp) (get condReg) cmpVal
         val' = (toOp op) (get reg) val
 
-run :: Program -> State
-run = foldl execute Map.empty
+
+runWithHistory :: Program -> [State]
+runWithHistory = scanl execute Map.empty
 
 findMax :: State -> Int
 findMax = Map.foldr max 0
+
 
 main :: IO ()
 main = do
   args <- getArgs
   let infile = args !! 0
   input <- readFile infile
-  let program = parseProgram $ lines input
-  let result = findMax $ run program
-  print result
+  let largests = findMax <$> (runWithHistory $ parseProgram $ lines input)
+  putStrLn $ "Largest value at end: " ++ show (last largests)
+  putStrLn $ "Largest value seen: " ++ show (foldr max 0 largests)
