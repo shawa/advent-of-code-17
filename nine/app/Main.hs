@@ -7,64 +7,45 @@ import Control.Monad ((>>), void)
 import Text.Parsec hiding (Stream)
 import Text.Parsec.String (Parser)
 
-data Stream = Group [Stream]
-            | Garbage Int
+data Stream = Group [Stream] | Garbage Int
             deriving (Show)
 
-parseStream :: Parser Stream
-parseStream = parseGarbage <|> parseGroup
+stream :: Parser Stream
+stream = garbage <|> group
 
-parseGarbage :: Parser Stream
-parseGarbage = between (string "<") (string ">") $ do
-  charCounts <- many (escapedChar <|> garbageChar)
-  return $ Garbage $ sum charCounts
+garbage :: Parser Stream
+garbage = between (string "<") (string ">") $ garbageContent >>= return . Garbage . sum
+  where garbageContent = many $ escaped <|> unescaped
+        escaped        = (void $ char '!' >> anyChar) >> return 0
+        unescaped      = (void $ noneOf ">")          >> return 1
 
-garbageChar :: Parser Int
-garbageChar = do
-  void $ noneOf ">"
-  return 1
-
-escapedChar :: Parser Int
-escapedChar = do
-  void $ char '!' >> anyChar
-  return 0
-
-parseGroup :: Parser Stream
-parseGroup = do
-  children <- between (string "{") (string "}") parseChildren
-  return $ Group children
-
-parseChildren :: Parser [Stream]
-parseChildren = option [] $ do
-  c <- parseStream
-  cs <- many groupComma
-  return $ c:cs
-
-groupComma :: Parser Stream
-groupComma = char ',' >> parseStream
-
-
-score' :: Int -> Stream -> Int
-score' _ (Garbage _) = 0
-score' depth (Group []) = depth
-score' depth (Group children) = depth + (sum $ (score' (depth+1)) <$> children)
+group :: Parser Stream
+group = between (string "{") (string "}") children >>= return . Group
+  where children = option [] $ do
+          c <- stream
+          cs <- many $ char ',' >> stream
+          return $ c:cs
 
 score :: Stream -> Int
 score = score' 1
+  where
+  score' _     (Garbage _)       = 0
+  score' depth (Group [])        = depth
+  score' depth (Group cs)  = (sum $ (score' $ depth + 1) <$> cs) + depth
 
 countGarbage :: Stream -> Int
-countGarbage (Garbage n) = n
-countGarbage (Group [])  = 0
-countGarbage (Group children) = sum $ countGarbage <$> children
+countGarbage (Garbage n)      = n
+countGarbage (Group [])       = 0
+countGarbage (Group cs) = sum $ countGarbage <$> cs
 
 main :: IO ()
 main = do
   args <- getArgs
   let infile = head args
   streamContents <- readFile infile
-  let parsed = parse parseStream [] streamContents
+  let parsed = parse stream [] streamContents
   case parsed of
     Left _ -> putStrLn "Failed to parse"
-    Right stream -> do
-      putStrLn $ "Stream has score of: " ++ (show $ score stream)
-      putStrLn $ "Total garbage chars: " ++ (show $ countGarbage stream)
+    Right s -> do
+      putStrLn $ "S has score of: " ++ (show $ score s)
+      putStrLn $ "Total garbage chars: " ++ (show $ countGarbage s)
