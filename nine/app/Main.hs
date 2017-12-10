@@ -14,10 +14,10 @@ stream :: Parser Stream
 stream = garbage <|> group
 
 garbage :: Parser Stream
-garbage = between (string "<") (string ">") $ garbageContent >>= return . Garbage . sum
-  where garbageContent = many $ escaped <|> unescaped
-        escaped        = (void $ char '!' >> anyChar) >> return 0
-        unescaped      = (void $ noneOf ">")          >> return 1
+garbage = between (string "<") (string ">") $ garbage' >>= return . Garbage . sum
+  where garbage'  = many $ escaped <|> unescaped
+        escaped   = (void $ char '!' >> anyChar) >> return 0
+        unescaped = (void $ noneOf ">")          >> return 1
 
 group :: Parser Stream
 group = between (string "{") (string "}") children >>= return . Group
@@ -28,15 +28,14 @@ group = between (string "{") (string "}") children >>= return . Group
 
 score :: Stream -> Int
 score = score' 1
-  where
-  score' _     (Garbage _)       = 0
-  score' depth (Group [])        = depth
-  score' depth (Group cs)  = (sum $ (score' $ depth + 1) <$> cs) + depth
+  where score' _     (Garbage _) = 0
+        score' depth (Group [])  = depth
+        score' depth (Group cs)  = (sum $ (score' $ depth + 1) <$> cs) + depth
 
 countGarbage :: Stream -> Int
-countGarbage (Garbage n)      = n
-countGarbage (Group [])       = 0
-countGarbage (Group cs) = sum $ countGarbage <$> cs
+countGarbage (Garbage n) = n
+countGarbage (Group [])  = 0
+countGarbage (Group cs)  = sum $ countGarbage <$> cs
 
 main :: IO ()
 main = do
